@@ -1,4 +1,4 @@
-const { Sequelize } = require('sequelize');
+const Sequelize = require('sequelize');
 require('dotenv').config(); // Load .env variables
 
 // Create Sequelize instance with MySQL connection details from .env

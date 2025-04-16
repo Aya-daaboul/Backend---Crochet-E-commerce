@@ -1,4 +1,3 @@
-
 const { sequelize } = require('../config/db');
 const Product = require('../models/product');
 const Image = require('../models/image');
@@ -36,13 +35,21 @@ exports.createProduct = async (req, res) => {
             );
         }
 
+        // Get the full product with images (INCLUDING TRANSACTION)
+        const createdProduct = await Product.findByPk(product.ID, {
+            include: [{
+                model: Image,
+                as: 'Images',
+                attributes: ['ID', 'Image_URL']
+            }],
+            transaction: t
+        });
+
         await t.commit();
         res.status(201).json({
             message: 'Product created successfully',
             productId: product.ID,
-            product: await Product.findByPk(product.ID, {
-                include: [{ model: Image, as: 'Images' }]
-            })
+            product: createdProduct
         });
     } catch (error) {
         await t.rollback();
@@ -133,11 +140,12 @@ exports.getProductsByCategory = async (req, res) => {
     }
 };
 
+
 // Admin-only: Update product
 exports.updateProduct = async (req, res) => {
     const t = await sequelize.transaction();
     try {
-        const product = await Product.findByPk(req.params.id);
+        const product = await Product.findByPk(req.params.id, { transaction: t });
         if (!product) {
             await t.rollback();
             return res.status(404).json({ message: 'Product not found' });
@@ -157,7 +165,11 @@ exports.updateProduct = async (req, res) => {
 
         // Update images if provided
         if (Images) {
-            await Image.destroy({ where: { P_id: product.ID }, transaction: t });
+            await Image.destroy({ 
+                where: { P_id: product.ID }, 
+                transaction: t 
+            });
+            
             if (Images.length > 0) {
                 await Image.bulkCreate(
                     Images.map(url => ({
@@ -169,12 +181,20 @@ exports.updateProduct = async (req, res) => {
             }
         }
 
+        // Get updated product with images (INCLUDING TRANSACTION)
+        const updatedProduct = await Product.findByPk(product.ID, {
+            include: [{
+                model: Image,
+                as: 'Images',
+                attributes: ['ID', 'Image_URL']
+            }],
+            transaction: t
+        });
+
         await t.commit();
         res.json({
             message: 'Product updated successfully',
-            product: await Product.findByPk(product.ID, {
-                include: [{ model: Image, as: 'Images' }]
-            })
+            product: updatedProduct
         });
     } catch (error) {
         await t.rollback();
