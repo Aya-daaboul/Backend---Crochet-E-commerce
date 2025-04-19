@@ -9,6 +9,8 @@ const Image = require('./models/image');
 const User = require('./models/user');
 const Review = require('./models/review');
 const Address = require('./models/address');
+const Order = require('./models/order');
+const OrderItem = require('./models/orderItem');
 
 const app = express();
 
@@ -32,6 +34,16 @@ const setupAssociations = () => {
     
     User.hasMany(Address, { foreignKey: 'U_id' });
     Address.belongsTo(User, { foreignKey: 'U_id' });
+
+    // Order relations
+    User.hasMany(Order, { foreignKey: 'U_id' });
+    Order.belongsTo(User, { foreignKey: 'U_id' });
+
+    Order.hasMany(OrderItem, { foreignKey: 'O_id', as: 'items' });
+    OrderItem.belongsTo(Order, { foreignKey: 'O_id' });
+
+    Product.hasMany(OrderItem, { foreignKey: 'P_id' });
+    OrderItem.belongsTo(Product, { foreignKey: 'P_id' });
 };
 
 // Initialize database WITHOUT altering structure
@@ -57,6 +69,8 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/reviews', require('./routes/reviewRoutes'));
 app.use('/api/address', require('./routes/addressRoutes'));
+app.use('/api/orders', require('./routes/orderRoutes'));
+
 
 app.get('/health', (req, res) => res.status(200).json({ status: 'OK' }));
 
