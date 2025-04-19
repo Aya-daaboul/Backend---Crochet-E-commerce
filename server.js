@@ -29,8 +29,6 @@ const setupAssociations = () => {
     Review.belongsTo(Product, { foreignKey: 'P_id' });
     
     // User relations
-    User.hasMany(Review, { foreignKey: 'U_id' });
-    Review.belongsTo(User, { foreignKey: 'U_id' });
     
     User.hasMany(Address, { foreignKey: 'U_id' });
     Address.belongsTo(User, { foreignKey: 'U_id' });

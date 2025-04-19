@@ -1,11 +1,8 @@
-const { sequelize } = require('../config/db');
 const Review = require('../models/review');
-const User = require('../models/user');
 
 exports.createReview = async (req, res) => {
     try {
         const { P_id, Description, Rating } = req.body;
-        const U_id = req.user.userId;
 
         if (Rating < 1 || Rating > 5) {
             return res.status(400).json({ message: 'Rating must be between 1 and 5' });
@@ -14,8 +11,7 @@ exports.createReview = async (req, res) => {
         const review = await Review.create({
             P_id,
             Description,
-            Rating,
-            U_id
+            Rating
         });
 
         res.status(201).json({
@@ -34,12 +30,9 @@ exports.createReview = async (req, res) => {
 exports.getProductReviews = async (req, res) => {
     try {
         const reviews = await Review.findAll({
-            where: { P_id: req.params.productId },
-            include: [{
-                model: User,
-                attributes: ['Name']
-            }]
+            where: { P_id: req.params.productId }
         });
+
         res.json(reviews);
     } catch (error) {
         console.error('Get Reviews Error:', error);
