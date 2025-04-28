@@ -85,3 +85,8 @@ initializeDatabase().then(() => {
         console.log(`🚀 Server running on port ${PORT}`);
     });
 });
+
+// Test route
+app.get("/", (req, res) => {
+  res.send("API is running");
+});
