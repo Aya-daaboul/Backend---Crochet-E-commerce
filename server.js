@@ -3,14 +3,17 @@ const express = require("express");
 const cors = require("cors");
 const sequelize = require("./config/db");
 
-//
+const app = express();
+
+// cors access for * (
 const corsOptions = {
   origin: "*",
-  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
-
 app.use(cors(corsOptions));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Import models
 const Product = require("./models/product");
@@ -21,28 +24,17 @@ const Address = require("./models/address");
 const Order = require("./models/order");
 const OrderItem = require("./models/orderItem");
 
-const app = express();
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Set up associations DIRECTLY (no model.associate)
+// Set up associations
 const setupAssociations = () => {
-  // Product relations
   Product.hasMany(Image, { foreignKey: "P_id", as: "Images" });
   Image.belongsTo(Product, { foreignKey: "P_id" });
 
   Product.hasMany(Review, { foreignKey: "P_id", as: "Reviews" });
   Review.belongsTo(Product, { foreignKey: "P_id" });
 
-  // User relations
-
   User.hasMany(Address, { foreignKey: "U_id" });
   Address.belongsTo(User, { foreignKey: "U_id" });
 
-  // Order relations
   User.hasMany(Order, { foreignKey: "U_id" });
   Order.belongsTo(User, { foreignKey: "U_id" });
 
@@ -53,7 +45,7 @@ const setupAssociations = () => {
   OrderItem.belongsTo(Product, { foreignKey: "P_id" });
 };
 
-// Initialize database WITHOUT altering structure
+// Initialize database
 const initializeDatabase = async () => {
   try {
     await sequelize.authenticate();
@@ -61,7 +53,6 @@ const initializeDatabase = async () => {
 
     setupAssociations();
 
-    // Only sync without altering existing tables
     await sequelize.sync();
     console.log("🔄 Models synchronized");
   } catch (error) {
@@ -79,10 +70,15 @@ app.use("/api/orders", require("./routes/orderRoutes"));
 
 app.get("/health", (req, res) => res.status(200).json({ status: "OK" }));
 
-// Error handling
+// Global error handling
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({ error: "Internal server error" });
+});
+
+// Test route
+app.get("/", (req, res) => {
+  res.send("API is running");
 });
 
 // Start server
@@ -91,9 +87,4 @@ initializeDatabase().then(() => {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
   });
-});
-
-// Test route
-app.get("/", (req, res) => {
-  res.send("API is running");
 });
