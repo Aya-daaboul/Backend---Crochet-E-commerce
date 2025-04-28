@@ -2,7 +2,7 @@
   "name": "backend---crochet-e-commerce",
   "version": "1.0.0",
   "description": "Welcome to the Backend of the Crochet E-commerce Website!\r This project is the final project in my bootcamp journey, representing my passion for crochet and handmade crafts.",
-  "main": "config.js",
+  "main": "server.js"
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
