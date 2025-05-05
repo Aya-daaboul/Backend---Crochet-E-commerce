@@ -5,13 +5,14 @@ const sequelize = require("./config/db");
 
 const app = express();
 
-// cors access for * (
-const corsOptions = {
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
-app.use(cors(corsOptions));
+// CORS settings
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -45,18 +46,22 @@ const setupAssociations = () => {
   OrderItem.belongsTo(Product, { foreignKey: "P_id" });
 };
 
-// Initialize database
-const initializeDatabase = async () => {
+// Initialize database and start server
+const startServer = async () => {
   try {
     await sequelize.authenticate();
     console.log("✅ Database connected");
 
     setupAssociations();
+    await sequelize.sync({ alter: true }); // ✅ only here
 
-    await sequelize.sync();
-    console.log("🔄 Models synchronized");
-  } catch (error) {
-    console.error("❌ Database initialization failed:", error);
+    console.log("✅ Models synced");
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("❌ Failed to start server:", err);
     process.exit(1);
   }
 };
@@ -68,23 +73,14 @@ app.use("/api/reviews", require("./routes/reviewRoutes"));
 app.use("/api/address", require("./routes/addressRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 
+// Health check
 app.get("/health", (req, res) => res.status(200).json({ status: "OK" }));
 
-// Global error handling
+// Global error handler
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({ error: "Internal server error" });
 });
 
-// Test route
-app.get("/", (req, res) => {
-  res.send("API is running");
-});
-
-// Start server
-const PORT = process.env.PORT || 3000;
-initializeDatabase().then(() => {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-  });
-});
+// Start it all
+startServer();
