@@ -94,7 +94,7 @@ const orderController = {
         0
       );
 
-      order.Status = "confirmed";
+      order.Status = "working on";
       order.TotalAmount = total;
       await order.save();
 
