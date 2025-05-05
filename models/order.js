@@ -1,5 +1,8 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
+const Address = require("./address");
+
+Order.hasOne(Address, { foreignKey: "O_id", as: "address" });
 
 const Order = sequelize.define(
   "Order",

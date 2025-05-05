@@ -2,6 +2,7 @@ const { Op } = require("sequelize");
 const Order = require("../models/order");
 const OrderItem = require("../models/orderItem");
 const Product = require("../models/product");
+const Address = require("../models/address");
 
 const orderController = {
   async addToCart(req, res) {
@@ -131,7 +132,17 @@ const orderController = {
     try {
       const orders = await Order.findAll({
         where: { U_id, Status: { [Op.ne]: "unconfirmed" } },
-        include: { model: OrderItem, as: "items", include: Product },
+        include: [
+          {
+            model: OrderItem,
+            as: "items",
+            include: Product,
+          },
+          {
+            model: Address,
+            as: "address",
+          },
+        ],
         order: [["createdAt", "DESC"]],
       });
 
