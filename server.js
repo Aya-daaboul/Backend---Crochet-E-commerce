@@ -44,6 +44,9 @@ const setupAssociations = () => {
 
   Product.hasMany(OrderItem, { foreignKey: "P_id" });
   OrderItem.belongsTo(Product, { foreignKey: "P_id" });
+
+  Order.hasOne(Address, { foreignKey: "O_id", as: "address" });
+  Address.belongsTo(Order, { foreignKey: "O_id", as: "order" });
 };
 
 // Initialize database and start server

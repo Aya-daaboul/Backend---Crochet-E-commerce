@@ -1,8 +1,5 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
-const Order = require("./order");
-
-Address.belongsTo(Order, { foreignKey: "O_id", as: "order" });
 
 const Address = sequelize.define(
   "Address",
