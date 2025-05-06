@@ -9,6 +9,10 @@ const Address = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
+    U_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     O_id: {
       type: DataTypes.INTEGER,
       allowNull: false,

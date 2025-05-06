@@ -5,12 +5,11 @@ const sequelize = require("./config/db");
 
 const app = express();
 
-// CORS settings
 app.use(
   cors({
     origin: ["http://localhost:5173", "https://change-later.com"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
@@ -18,7 +17,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Import models
+/* ---------- Import models ---------- */
 const Product = require("./models/product");
 const Image = require("./models/image");
 const User = require("./models/user");
@@ -27,65 +26,79 @@ const Address = require("./models/address");
 const Order = require("./models/order");
 const OrderItem = require("./models/orderItem");
 
-// Set up associations
+/* ---------- Associations ---------- */
 const setupAssociations = () => {
-  Product.hasMany(Image, { foreignKey: "P_id", as: "Images" });
-  Image.belongsTo(Product, { foreignKey: "P_id" });
+  Product.hasMany(Image, {
+    foreignKey: "P_id",
+    as: "Images",
+    constraints: false,
+  });
+  Image.belongsTo(Product, { foreignKey: "P_id", constraints: false });
 
-  Product.hasMany(Review, { foreignKey: "P_id", as: "Reviews" });
-  Review.belongsTo(Product, { foreignKey: "P_id" });
+  Product.hasMany(Review, {
+    foreignKey: "P_id",
+    as: "Reviews",
+    constraints: false,
+  });
+  Review.belongsTo(Product, { foreignKey: "P_id", constraints: false });
 
-  User.hasMany(Address, { foreignKey: "U_id" });
-  Address.belongsTo(User, { foreignKey: "U_id" });
+  User.hasMany(Address, { foreignKey: "U_id", constraints: false });
+  Address.belongsTo(User, { foreignKey: "U_id", constraints: false });
 
-  User.hasMany(Order, { foreignKey: "U_id" });
-  Order.belongsTo(User, { foreignKey: "U_id" });
+  User.hasMany(Order, { foreignKey: "U_id", constraints: false });
+  Order.belongsTo(User, { foreignKey: "U_id", constraints: false });
 
-  Order.hasMany(OrderItem, { foreignKey: "O_id", as: "items" });
-  OrderItem.belongsTo(Order, { foreignKey: "O_id" });
+  Order.hasMany(OrderItem, {
+    foreignKey: "O_id",
+    as: "items",
+    constraints: false,
+  });
+  OrderItem.belongsTo(Order, { foreignKey: "O_id", constraints: false });
 
-  Product.hasMany(OrderItem, { foreignKey: "P_id" });
-  OrderItem.belongsTo(Product, { foreignKey: "P_id" });
+  Product.hasMany(OrderItem, { foreignKey: "P_id", constraints: false });
+  OrderItem.belongsTo(Product, { foreignKey: "P_id", constraints: false });
 
-  Order.hasOne(Address, { foreignKey: "O_id", as: "address" });
-  Address.belongsTo(Order, { foreignKey: "O_id", as: "order" });
+  Order.hasOne(Address, {
+    foreignKey: "O_id",
+    as: "address",
+    constraints: false,
+  });
+  Address.belongsTo(Order, {
+    foreignKey: "O_id",
+    as: "order",
+    constraints: false,
+  });
 };
 
-// Initialize database and start server
+/* ---------- Init + start ---------- */
 const startServer = async () => {
   try {
-    await sequelize.authenticate();
+    await sequelize.authenticate(); // one connect is enough
     console.log("✅ Database connected");
 
-    setupAssociations();
-    await sequelize.sync({ alter: true }); // ✅ only here
+    setupAssociations(); // sets relations in memory only
 
-    console.log("✅ Models synced");
+    /* no sync/alter here — migrations/manual SQL only */
     const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
   } catch (err) {
     console.error("❌ Failed to start server:", err);
     process.exit(1);
   }
 };
 
-// Routes
+/* ---------- Routes ---------- */
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/reviews", require("./routes/reviewRoutes"));
 app.use("/api/address", require("./routes/addressRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 
-// Health check
-app.get("/health", (req, res) => res.status(200).json({ status: "OK" }));
+app.get("/health", (_req, res) => res.json({ status: "OK" }));
 
-// Global error handler
-app.use((err, req, res, next) => {
+app.use((err, _req, res, _next) => {
   console.error(err);
   res.status(500).json({ error: "Internal server error" });
 });
 
-// Start it all
 startServer();

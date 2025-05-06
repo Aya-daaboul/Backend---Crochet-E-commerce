@@ -31,12 +31,6 @@ const User = sequelize.define(
         this.setDataValue("Password", hash);
       },
     },
-
-    U_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: { model: "Users", key: "ID" },
-    },
   },
   {
     timestamps: false,
