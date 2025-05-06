@@ -143,7 +143,7 @@ const orderController = {
             as: "address",
           },
         ],
-        order: [["createdAt", "DESC"]],
+        order: [["ID", "DESC"]],
       });
 
       res.status(200).json(orders);
