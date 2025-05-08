@@ -11,7 +11,7 @@ router.get("/history", authenticate, orderController.getOrders);
 router.delete("/remove", authenticate, orderController.removeItem);
 router.post(
   "/status/update",
-  authMiddleware,
+  authenticate,
   authorize("admin"),
   orderController.updateOrderStatus
 );
