@@ -82,6 +82,9 @@ const startServer = async () => {
     await sequelize.authenticate(); // one connect is enough
     console.log("✅ Database connected");
 
+    await sequelize.sync({ alter: true }); // or { force: false }
+    console.log("✅ Tables created/updated");
+
     setupAssociations(); // sets relations in memory only
 
     /* no sync/alter here — migrations/manual SQL only */
