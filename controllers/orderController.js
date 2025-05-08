@@ -187,6 +187,34 @@ const orderController = {
       res.status(500).json({ error: "Server error", details: error.message });
     }
   },
+
+  async updateOrderStatus(req, res) {
+    const { orderId, status } = req.body;
+
+    const validStatuses = [
+      "confirmed",
+      "working on",
+      "to be delivered",
+      "delivered",
+      "cancelled",
+    ];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: "Invalid status value" });
+    }
+
+    try {
+      const order = await Order.findByPk(orderId);
+      if (!order) return res.status(404).json({ error: "Order not found" });
+
+      order.Status = status;
+      await order.save();
+
+      res.status(200).json({ message: "Order status updated", order });
+    } catch (error) {
+      console.error("Admin status update error:", error);
+      res.status(500).json({ error: "Server error", details: error.message });
+    }
+  },
 };
 
 module.exports = orderController;

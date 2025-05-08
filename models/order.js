@@ -23,10 +23,12 @@ const Order = sequelize.define(
         "confirmed",
         "working on",
         "to be delivered",
-        "delivered"
+        "delivered",
+        "cancelled"
       ),
       defaultValue: "unconfirmed",
     },
+
     TotalAmount: {
       type: DataTypes.DECIMAL(10, 2),
       defaultValue: 0.0,
