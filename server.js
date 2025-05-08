@@ -15,6 +15,9 @@ app.use(
 );
 
 app.use(express.json());
+const path = require("path");
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 app.use(express.urlencoded({ extended: true }));
 
 /* ---------- Import models ---------- */
@@ -93,6 +96,7 @@ app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/reviews", require("./routes/reviewRoutes"));
 app.use("/api/address", require("./routes/addressRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
+app.use("/api/uploads", require("./routes/uploadRoutes"));
 
 app.get("/health", (_req, res) => res.json({ status: "OK" }));
 
