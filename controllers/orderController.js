@@ -215,6 +215,30 @@ const orderController = {
       res.status(500).json({ error: "Server error", details: error.message });
     }
   },
+
+  async getAllOrders(req, res) {
+    try {
+      const orders = await Order.findAll({
+        include: [
+          {
+            model: OrderItem,
+            as: "items",
+            include: Product,
+          },
+          {
+            model: Address,
+            as: "address",
+          },
+        ],
+        order: [["ID", "DESC"]],
+      });
+
+      res.status(200).json(orders);
+    } catch (error) {
+      console.error("Error in getAllOrders:", error);
+      res.status(500).json({ error: "Server error", details: error.message });
+    }
+  },
 };
 
 module.exports = orderController;

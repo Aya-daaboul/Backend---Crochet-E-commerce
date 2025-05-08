@@ -16,5 +16,11 @@ router.post(
   authorize("admin"),
   orderController.updateOrderStatus
 );
+router.get(
+  "/all",
+  authenticate,
+  authorize("admin"),
+  orderController.getAllOrders
+);
 
 module.exports = router;
