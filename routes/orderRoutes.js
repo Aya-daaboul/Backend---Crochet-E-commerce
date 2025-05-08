@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const orderController = require("../controllers/orderController");
 const authenticate = require("../middlewares/authMiddleware");
+const authorize = require("../middlewares/authorize");
 
 router.post("/add", authenticate, orderController.addToCart);
 router.get("/cart", authenticate, orderController.getCart);
