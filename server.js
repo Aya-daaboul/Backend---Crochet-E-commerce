@@ -4,6 +4,8 @@ const cors = require("cors");
 const sequelize = require("./config/db");
 
 const app = express();
+const logger = require("./middlewares/logger");
+app.use(logger);
 
 app.use(
   cors({
