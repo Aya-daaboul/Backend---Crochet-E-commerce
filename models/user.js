@@ -31,6 +31,11 @@ const User = sequelize.define(
         this.setDataValue("Password", hash);
       },
     },
+    Role: {
+      type: DataTypes.ENUM("user", "admin"),
+      allowNull: false,
+      defaultValue: "user",
+    },
   },
   {
     timestamps: false,
